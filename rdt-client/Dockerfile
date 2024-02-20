@@ -8,9 +8,9 @@ ARG BUILD_ARCH
 # Stage 1 - Build the frontend
 FROM node:18-alpine3.18 AS node-build-env
 ARG TARGETPLATFORM
-ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
+ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/arm64}
 ARG BUILDPLATFORM
-ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/amd64}
+ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/arm64}
 
 RUN mkdir /appclient
 WORKDIR /appclient
@@ -30,11 +30,11 @@ RUN \
 RUN ls -FCla /appclient/root
 
 # Stage 2 - Build the backend
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-amd64 AS dotnet-build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0.201-bookworm-slim-arm64v8 AS dotnet-build-env
 ARG TARGETPLATFORM
-ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
+ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/arm64}
 ARG BUILDPLATFORM
-ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/amd64}
+ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/arm64}
 
 RUN mkdir /appserver
 WORKDIR /appserver
@@ -44,14 +44,14 @@ RUN \
    git clone https://github.com/rogerfar/rdt-client.git . && \
    echo "**** Building Source Code for $TARGETPLATFORM on $BUILDPLATFORM ****" && \
    cd server && \
-   dotnet restore --no-cache RdtClient.sln && dotnet publish --no-restore -c Release -o out ; 
+   dotnet restore --no-cache RdtClient.sln && dotnet publish --no-restore -c Release -o out ;
 
 # Stage 3 - Build runtime image
 FROM ghcr.io/linuxserver/baseimage-alpine:3.18
 ARG TARGETPLATFORM
-ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
+ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/arm64}
 ARG BUILDPLATFORM
-ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/amd64}
+ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/arm64}
 
 # set version label
 ARG BUILD_DATE
@@ -106,4 +106,4 @@ EXPOSE 6500
 VOLUME [ "/data" ]
 
 # Check Status
-HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 CMD curl --fail http://localhost:6500 || exit 
+HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 CMD curl --fail http://localhost:6500 || exit
