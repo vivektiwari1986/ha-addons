@@ -1,0 +1,24 @@
+name: RDTClient
+version: 1.0.0
+slug: rdtclient
+description: |
+  RDT Client is a UI to manage your debrid service
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: once
+stage: stable
+boot: manual
+url: https://github.com/vivektiwari1986/ha-addons/tree/master/rdt-client
+hassio_role: default
+hassio_api: true
+map:
+  - config:rw
+  - share:rw
+options:
+  configuration_path: "/share/rclone/rclone.conf"
+schema:
+  configuration_path: str
